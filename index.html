@@ -331,16 +331,16 @@
     }
 
     /* ─── CTA BUTTON ────────────────────────────────────────── */
+    .esconder {
+      display: none !important;
+    }
     .cta-wrap {
-      display: none;
       flex-direction: column;
       align-items: center;
       gap: 10px;
       margin-top: 28px;
-    }
-    .cta-wrap.show {
-      animation: ctaIn 0.8s 0.05s forwards ease;
-      display: flex;
+      display: flex; /* Vturb remove .esconder para exibir */
+      animation: ctaIn 0.8s ease forwards;
     }
     @keyframes ctaIn {
       0%   { opacity:0; transform:scale(0.86) translateY(20px); }
@@ -673,17 +673,14 @@
       <div class="vsl-frame">
         <div class="vsl-embed">
 
-          <!-- ▼▼▼ COLE O EMBED DA VTURB AQUI (substitua o bloco abaixo) ▼▼▼ -->
-          <div class="vsl-placeholder" id="vsl-placeholder">
-            <div class="play-btn">
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
-                <path d="M8 5v14l11-7z"/>
-              </svg>
-            </div>
-            <p>Assista ao vídeo e descubra como</p>
-            <span class="embed-hint">↑ Substitua este bloco pelo código embed da Vturb ↑</span>
-          </div>
-          <!-- ▲▲▲ FIM DO BLOCO VTURB ▲▲▲ -->
+          <!-- EMBED VTURB -->
+          <vturb-smartplayer id="vid-6a22e5e791219f3840975c5a" style="display: block; margin: 0 auto; width: 100%;"></vturb-smartplayer>
+          <script type="text/javascript">
+            var s = document.createElement("script");
+            s.src = "https://scripts.converteai.net/8bd7c4c1-93d0-4bce-a010-bd11788b1035/players/6a22e5e791219f3840975c5a/v4/player.js";
+            s.async = true;
+            document.head.appendChild(s);
+          </script>
 
         </div>
       </div>
@@ -704,8 +701,8 @@
         </div>
       </div>
 
-      <!-- CTA — aparece ao fim do vídeo -->
-      <div class="cta-wrap" id="cta-container">
+      <!-- CTA — aparece após o delay definido no script Vturb -->
+      <div class="cta-wrap esconder" id="cta-container">
         <a
           class="cta-btn"
           href="https://wa.me/5531971151972?text=Quero%20saber%20como%20isso%20se%20aplicaria%20para%20a%20minha%20empresa!"
@@ -968,37 +965,22 @@
       });
     });
 
-    /* ── VTURB CTA REVEAL ──────────────────────────────────────
-       O botão CTA fica oculto e aparece APENAS quando o vídeo
-       da Vturb terminar (evento 'ended' do smartplayer).
-
-       Este código já está pronto — NÃO precisa alterar nada
-       após inserir o embed. O SDK da Vturb expõe o evento
-       globalmente via window.smartplayer.
+    /* ── VTURB DELAY — exibe .esconder após delaySeconds ──────
+       O botão CTA possui a classe .esconder e fica oculto.
+       O player Vturb chama displayHiddenElements() após
+       delaySeconds segundos de vídeo assistido.
+       persist:true garante que usuários que retornam não
+       precisam esperar novamente.
     ─────────────────────────────────────────────────────────── */
-    function showCTA() {
-      const wrap = document.getElementById('cta-container');
-      if (wrap && !wrap.classList.contains('show')) {
-        wrap.classList.add('show');
-        setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'center' }), 350);
-      }
+    var delaySeconds = 2524;
+    var player = document.querySelector("vturb-smartplayer");
+    if (player) {
+      player.addEventListener("player:ready", function () {
+        player.displayHiddenElements(delaySeconds, [".esconder"], {
+          persist: true
+        });
+      });
     }
-
-    window.addEventListener('load', function () {
-      if (typeof smartplayer !== 'undefined') {
-        smartplayer.on('ended', showCTA);
-      } else {
-        document.addEventListener('smartplayer:ready', () => smartplayer.on('ended', showCTA));
-      }
-    });
-
-    /* FALLBACK PREVIEW — remova após inserir o embed real */
-    const ph = document.getElementById('vsl-placeholder');
-    if (ph) {
-      setTimeout(showCTA, 5000);           // aparece após 5s sem vídeo
-      ph.addEventListener('click', showCTA); // ou ao clicar no placeholder
-    }
-    /* FIM DO FALLBACK */
   </script>
 
 </body>
